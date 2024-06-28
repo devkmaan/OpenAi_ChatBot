@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Chatbot</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, rgba(96, 143, 149, 1) 0%, rgba(0, 133, 136, 1) 9%, rgba(12, 36, 73, 1) 52%, rgba(26, 30, 59, 1) 100%);
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            height: 100%;
+        }
+
+        .panel {
+            margin-bottom: 20px;
+            background-color: #030000;
+            border: 6px solid transparent;
+            border-radius: 25px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+        }
+
+        .panel-info {
+            border-color: #0c2735;
+        }
+
+        .panel-info>.panel-heading {
+            color: white;
+            background-color: #000508;
+            border-color: #0c2735;
+        }
+
+        .fixed-panel {
+            min-height: 400px;
+            max-height: 400px;
+            background-color: #19313c;
+            color: rgb(141, 19, 74);
+            overflow: auto;
+        }
+
+        .media-list {
+            overflow: auto;
+            clear: both;
+            display: table;
+        }
+
+        .panel-footer {
+            padding: 10px 15px;
+            background-color: #0c2735;
+            border-top: 1px solid #0c2735;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <br>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div id="chatPanel" class="panel panel-info">
+                    <div class="panel-heading">
+                        <strong><span class="glyphicon glyphicon-globe"></span> Chatbot  </strong>
+                    </div>
+                    <div class="panel-body fixed-panel">
+                        <ul class="media-list"></ul>
+                    </div>
+                    <div class="panel-footer">
+                        <form method="post" id="chatbot-form">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Enter Message" name="messageText" id="messageText" autofocus>
+                                <span class="input-group-btn">
+                                    <button class="btn btn-info" type="button" id="chatbot-form-btn">Send</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script>
+        $(function () {
+            $('#chatbot-form-btn').click(function (e) {
+                e.preventDefault();
+                $('#chatbot-form').submit();
+            });
+
+            $('#chatbot-form').submit(function (e) {
+                e.preventDefault();
+                var message = $('#messageText').val();
+                $(".media-list").append(
+                    '<li class="media"><div class="media-body"><div class="media"><div style="text-align:right; color : #2EFE2E" class="media-body">' +
+                    message + '<hr/></div></div></div></li>');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/ask",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        $('#messageText').val('');
+                        var answer = response.answer;
+                        const chatPanel = document.getElementById("chatPanel");
+                        $(".media-list").append(
+                            '<li class="media"><div class="media-body"><div class="media"><div style="color : white" class="media-body">' +
+                            answer + '<hr/></div></div></div></li>');
+                        $(".fixed-panel").stop().animate({
+                            scrollTop: $(".fixed-panel")[0].scrollHeight
+                        }, 1000);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
